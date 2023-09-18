@@ -5,10 +5,13 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv")
 const helmet = require("helmet")
 const morgan = require("morgan")
+const multer = require("multer")
 
 //import Route from route
 const authRoute = require("./routes/auth.js")
 const usersRoute = require("./routes/users.js")
+const postsRoute = require("./routes/post.js")
+const categoriesRoute = require("./routes/categories.js")
 
 dotenv.config();
 const corsOpt = {
@@ -48,6 +51,22 @@ mongoose
 
 
 
+
+//storage
+const storage = multer.diskStorage({
+  destinationn: (req, file, cb) => {
+    cb(null, "images")
+  }, filename: (req, file, cb) => {
+    cb(null, "hello.jpeg")
+  }
+})
+
+const upload = multer({ storage: storage })
+
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  res.status(200).json("File has been uploaded ")
+})
+
 app.get("/api/test", (req, res) => {
   res.send("Oke")
 })
@@ -55,3 +74,5 @@ app.get("/api/test", (req, res) => {
 
 app.use("/api/auth", authRoute)
 app.use("/api/users", usersRoute)
+app.use("/api/posts", postsRoute)
+app.use("/api/categories", categoriesRoute)
