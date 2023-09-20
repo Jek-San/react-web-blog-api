@@ -6,6 +6,7 @@ const dotenv = require("dotenv")
 const helmet = require("helmet")
 const morgan = require("morgan")
 const multer = require("multer")
+const path = require("path")
 
 //import Route from route
 const authRoute = require("./routes/auth.js")
@@ -25,12 +26,14 @@ const corsOpt = {
 //Middleware
 
 const app = express()
+app.use(cors(corsOpt))
 app.use(express.json());
-app.unsubscribe(express.json());
+
 app.use(helmet({
   crossOriginResourcePolicy: false,
 }))
 app.use(morgan("common"))
+app.use("/images", express.static(path.join(__dirname, "/images")))
 
 
 mongoose
@@ -54,10 +57,12 @@ mongoose
 
 //storage
 const storage = multer.diskStorage({
-  destinationn: (req, file, cb) => {
+  destination: (req, file, cb) => {
     cb(null, "images")
   }, filename: (req, file, cb) => {
-    cb(null, "hello.jpeg")
+
+    const nameFile = req.body.name;
+    cb(null, nameFile);
   }
 })
 
