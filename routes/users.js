@@ -9,6 +9,13 @@ router.put("/:id", async (req, res) => {
   console.log("user update on call")
   if (req.body.userId === req.params.id) {
     if (req.body.password) {
+      //Check ValidPassword
+      // const validPassword = await bcrypt.compare(req.body.password, user.password)
+
+      // if (!validPassword) {
+      //   return res.status(400).json("Wrong pssword")
+      // }
+
       const salt = await bcrypt.genSalt(10);
       req.body.password = await bcrypt.hash(req.body.password, salt)
 
@@ -17,8 +24,11 @@ router.put("/:id", async (req, res) => {
       const updateUser = await User.findByIdAndUpdate(req.params.id, {
         $set: req.body
       }, { new: true })
+      const user = await User.findById(req.body.userId)
 
-      res.status(200).json(updateUser)
+      const { password, ...others } = user._doc
+      console.log(others)
+      res.status(200).json(others)
     }
     catch (err) {
       console.log(err)
@@ -69,6 +79,7 @@ router.get("/:id", async (req, res) => {
     const { password, ...others } = user._doc
     res.status(200).json(others)
   } catch (err) {
+    console.log(err)
     res.status(500).json(err)
   }
 })
